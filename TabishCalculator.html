@@ -1,0 +1,152 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tabish Calculator</title>
+<style>
+  :root{
+    --bg: linear-gradient(180deg,#071021 0%, #071428 100%);
+    --accent: #ff6b6b;
+    --muted: rgba(230,238,248,0.85);
+    --btn-bg: rgba(255,255,255,0.04);
+    font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--muted);-webkit-font-smoothing:antialiased}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .calculator{
+    width:100%;max-width:420px;border-radius:18px;padding:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    box-shadow: 0 20px 50px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    backdrop-filter: blur(6px);
+  }
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .logo{width:56px;height:56px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),#ff9a9a);
+    display:flex;align-items:center;justify-content:center;
+    color:white;font-weight:700;font-size:18px;
+    box-shadow:0 8px 30px rgba(255,107,107,0.12);
+  }
+  .title{font-size:18px;color:#fff3f3}
+  .subtitle{font-size:13px;color:var(--muted);margin-top:4px;font-style:italic}
+  .display{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px;padding:12px 14px;margin-bottom:14px;
+    border:1px solid rgba(255,255,255,0.02);
+  }
+  .result{font-size:32px;font-weight:700;color:white;text-align:right;min-height:36px;word-break:break-all}
+  .keypad{display:grid;grid-template-columns: repeat(4, 1fr);gap:10px}
+  button.btn{
+    background:var(--btn-bg);border:none;padding:14px;border-radius:10px;
+    color:var(--muted);font-weight:700;font-size:16px;cursor:pointer;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.25), inset 0 1px 0 rgba(255,255,255,0.02);
+    transition: transform .08s ease;
+  }
+  button.btn:active{transform: translateY(2px) scale(0.995);}
+  button.op{background: linear-gradient(180deg,var(--accent), #ff9a9a); color: #071428;}
+  button.wide{grid-column: span 2;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="calculator">
+      <div class="top">
+        <div class="logo">TC</div>
+        <div>
+          <div class="title">Tabish Calculator</div>
+          <div class="subtitle">“Numbers are not relevant.”</div>
+        </div>
+      </div>
+      <div class="display"><div class="result" id="result">0</div></div>
+      <div class="keypad" id="keypad">
+        <button class="btn" data-key="7">7</button>
+        <button class="btn" data-key="8">8</button>
+        <button class="btn" data-key="9">9</button>
+        <button class="btn op" data-op="div">÷</button>
+
+        <button class="btn" data-key="4">4</button>
+        <button class="btn" data-key="5">5</button>
+        <button class="btn" data-key="6">6</button>
+        <button class="btn op" data-op="mul">×</button>
+
+        <button class="btn" data-key="1">1</button>
+        <button class="btn" data-key="2">2</button>
+        <button class="btn" data-key="3">3</button>
+        <button class="btn op" data-op="sub">−</button>
+
+        <button class="btn wide" data-key="0">0</button>
+        <button class="btn" data-key=".">.</button>
+        <button class="btn op" data-op="add">+</button>
+
+        <button class="btn" id="clear">C</button>
+        <button class="btn wide op" id="equals">=</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const resultEl = document.getElementById('result');
+const keypad = document.getElementById('keypad');
+const clearBtn = document.getElementById('clear');
+const equalsBtn = document.getElementById('equals');
+
+let expr = '';
+
+function hallucinate(real){
+  const absurd = [
+    '42, obviously.',
+    'Approximately ' + (Math.round(Math.random()*1000)) + ' jellybeans 🍬',
+    'Your total: ' + (Math.random()*9999).toFixed(2) + ' (give or take infinity)',
+    'Banana-powered calculation 🍌',
+    'Result pending divine approval 🙏',
+    'Math took a coffee break ☕',
+    'Quantumly unstable answer',
+    'About ' + Math.round(Math.random()*5000) + ' potatoes 🥔',
+    'Somewhere between yes and no',
+    'Pi… but not quite.'
+  ];
+  if (Math.random() < 0.3) return (real + (Math.random()*100 - 50)).toFixed(2);
+  return absurd[Math.floor(Math.random()*absurd.length)];
+}
+
+keypad.addEventListener('click', (e)=>{
+  const k = e.target.closest('button');
+  if (!k) return;
+  const key = k.getAttribute('data-key');
+  const op = k.getAttribute('data-op');
+  if (key !== null){
+    if (key === '.' && expr.slice(-1) === '.') return;
+    expr += key;
+    resultEl.textContent = expr;
+  } else if (op){
+    const map = {add:'+', sub:'-', mul:'*', div:'/'};
+    expr += map[op] || '';
+    resultEl.textContent = expr;
+  }
+});
+
+clearBtn.addEventListener('click', ()=>{ expr = ''; resultEl.textContent = '0'; });
+
+equalsBtn.addEventListener('click', ()=>{
+  if (!expr) return;
+  const safe = expr.replace(/[^0-9+\-*/(). ]/g, '');
+  let realOut;
+  try { realOut = Function('"use strict";return (' + safe + ')')(); } catch(e) { realOut = NaN; }
+  const fake = hallucinate(Number.isFinite(realOut) ? realOut : 0);
+  resultEl.textContent = fake;
+  expr = '';
+});
+
+document.addEventListener('keydown', (e)=>{
+  if (e.key >= '0' && e.key <= '9') { expr += e.key; resultEl.textContent = expr; }
+  if (e.key === '.') { expr += '.'; resultEl.textContent = expr; }
+  if (['+','-','*','/'].includes(e.key)) { expr += e.key; resultEl.textContent = expr; }
+  if (e.key === 'Enter') { equalsBtn.click(); }
+  if (e.key === 'Backspace') { expr = expr.slice(0,-1); resultEl.textContent = expr || '0'; }
+});
+</script>
+</body>
+</html>
